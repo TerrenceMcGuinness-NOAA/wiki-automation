@@ -63,7 +63,7 @@ Go to: https://github.com/AntonMFernando-NOAA/wiki/actions
 ## How It Works
 
 ### Scheduled Execution
-- Runs Monday-Friday at 06:00 UTC
+- Runs Monday-Friday at 23:59 UTC
 - Auto-discovers all `AntonMFernando-NOAA` repositories
 - Collects activity from previous day
 - Updates **this repository's wiki** with narrative summary
