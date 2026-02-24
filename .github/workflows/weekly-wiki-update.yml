@@ -1,0 +1,65 @@
+# ============================================================
+# Weekly Wiki Update - Friday summaries
+# ============================================================
+
+name: Weekly Wiki Update
+
+on:
+  schedule:
+    - cron: '0 11 * * 5'        # 11:00 UTC on Fridays
+  workflow_dispatch:
+    inputs:
+      week_start:
+        description: 'Week start date (YYYY-MM-DD). Leave blank for last Monday.'
+        required: false
+        default: ''
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests python-dateutil
+
+      - name: Generate weekly summary
+        env:
+          GH_TOKEN: ${{ secrets.WIKI_PAT }}
+          GITHUB_ACTOR: ${{ vars.GITHUB_ACTOR || 'AntonMFernando-NOAA' }}
+          WEEK_START: ${{ inputs.week_start }}
+        run: python generate_weekly_summary.py
+
+      - name: Push to wiki
+        env:
+          WIKI_PAT: ${{ secrets.WIKI_PAT }}
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Clone this repository's wiki
+          git clone https://x-access-token:${WIKI_PAT}@github.com/AntonMFernando-NOAA/wiki-automation.wiki.git wiki
+          cd wiki
+
+          # Create Weekly-Updates.md if missing
+          if [ ! -f Weekly-Updates.md ]; then
+            printf '# Weekly Updates\n\nAutomatically generated weekly activity summaries.\n\n---\n\n' \
+              > Weekly-Updates.md
+          fi
+
+          # Prepend new entry (newest at top)
+          cat ../weekly_summary_patch.md Weekly-Updates.md > tmp_updates.md
+          mv tmp_updates.md Weekly-Updates.md
+
+          git add Weekly-Updates.md
+          git diff --cached --quiet \
+            || (git commit -m "Weekly wiki update: $(date -u +%Y-W%V)" && git push)
