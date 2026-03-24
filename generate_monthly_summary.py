@@ -205,9 +205,7 @@ def generate_narrative(prs, commits):
 # ── Write output ──────────────────────────────────────────────────────────────
 def write_summary(narrative):
     with open("monthly_summary_patch.md", "w") as f:
-        f.write(f"## Progress Report — {MONTH_LABEL}\n\n")
-        f.write(f"{narrative}\n\n")
-        f.write("---\n\n")
+        f.write(f"- **{MONTH_LABEL}**: {narrative}\n\n")
     print("✓ Monthly summary written to monthly_summary_patch.md")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
