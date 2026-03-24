@@ -15,9 +15,9 @@ effort.
 
 | Workflow | Schedule | Wiki page |
 |----------|----------|-----------|
-| Daily summary | Mon–Fri at 19:59 UTC | `Daily-Updates.md` |
-| Weekly summary | Every Friday at 19:59 UTC | `Weekly-Updates.md` |
-| Monthly summary | Last day of each month at 19:59 UTC | `Monthly-Updates.md` |
+| Daily summary | Mon–Fri at 19:59 UTC | `Daily-Updates` |
+| Weekly summary | Every Friday at 19:59 UTC | `Weekly-Updates` |
+| Monthly summary | Last day of each month at 19:59 UTC | `Monthly-Updates` |
 
 All workflows can also be triggered manually for any date range.
 
