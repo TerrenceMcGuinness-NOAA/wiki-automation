@@ -60,5 +60,4 @@ jobs:
 
           git add Daily-Updates.md _Sidebar.md
           git diff --cached --quiet \
-            || git commit -m "Daily wiki update: $(date -u +%Y-%m-%d)" \
-            && git push
+            || (git commit -m "Daily wiki update: $(date -u +%Y-%m-%d)" && git push)
