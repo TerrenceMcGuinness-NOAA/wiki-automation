@@ -266,16 +266,19 @@ for p in all_prs:
             f"https://api.github.com/repos/{p['repo_full']}/pulls/{p['number']}",
             headers=GH_HEADERS,
         ).json()
-        branch = detail.get("head", {}).get("ref", "")
+        head        = detail.get("head", {})
+        branch      = head.get("ref", "")
+        # For fork-based PRs the branch lives on the fork, not the base repo
+        head_repo_full = (head.get("repo") or {}).get("full_name") or p["repo_full"]
         p["branch"]      = branch
-        if (p["repo_full"], branch) in active_pr_branches:
+        if (head_repo_full, branch) in active_pr_branches:
             p["had_commits"] = True
         elif branch:
             # PR may be in a repo the user contributes to but doesn't own — scan it directly
-            msgs = _branch_msgs(p["repo_full"], branch)
+            msgs = _branch_msgs(head_repo_full, branch)
             p["had_commits"] = bool(msgs)
             if msgs:
-                active_pr_branches.add((p["repo_full"], branch))
+                active_pr_branches.add((head_repo_full, branch))
                 commit_messages.extend(msgs)
         else:
             p["had_commits"] = False
