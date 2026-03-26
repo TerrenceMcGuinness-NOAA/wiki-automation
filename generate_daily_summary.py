@@ -254,7 +254,17 @@ for p in all_prs:
         ).json()
         branch = detail.get("head", {}).get("ref", "")
         p["branch"]      = branch
-        p["had_commits"] = bool(branch) and (p["repo_full"], branch) in active_pr_branches
+        if (p["repo_full"], branch) in active_pr_branches:
+            p["had_commits"] = True
+        elif branch:
+            # PR may be in a repo the user contributes to but doesn't own — scan it directly
+            msgs = _branch_msgs(p["repo_full"], branch)
+            p["had_commits"] = bool(msgs)
+            if msgs:
+                active_pr_branches.add((p["repo_full"], branch))
+                commit_messages.extend(msgs)
+        else:
+            p["had_commits"] = False
     except Exception:
         p["had_commits"] = True  # safe default: include in narrative
 
