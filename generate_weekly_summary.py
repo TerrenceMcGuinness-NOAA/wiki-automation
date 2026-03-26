@@ -269,7 +269,7 @@ def _template_narrative(prs, commits, branch_work):
     open_prs   = [p for p in narrative_prs if p["state"] == "open"]
     merged_prs = [p for p in narrative_prs if p["state"] == "merged"]
     parts = []
-    titles_short = "; ".join(p["title"][:70] for p in narrative_prs[:3])
+    titles_short = "; ".join(f"[#{p['number']}]({p['url']}) {p['title'][:60]}" for p in narrative_prs[:3])
     if titles_short:
         parts.append(f"This week's work covered: {titles_short}.")
     if branch_work:
@@ -294,7 +294,7 @@ def generate_narrative(prs, commits, branch_work):
         )
 
     pr_block = "\n".join(
-        f"- PR #{p['number']} ({p['state']}) [{p['repo']}]: {p['title']}"
+        f"- [#{p['number']}]({p['url']}) ({p['state']}) [{p['repo']}]: {p['title']}"
         + (f"\n  {p['body'][:200]}" if p["body"].strip() else "")
         for p in narrative_prs
     ) or "None"
@@ -317,6 +317,7 @@ def generate_narrative(prs, commits, branch_work):
         "Include work done directly in branches even if no PR exists yet. "
         "Mention specific variable names, file types, or components only when they "
         "are central to the descriptions. "
+        "When referencing a PR, use its markdown link exactly as given in the input (e.g. [#123](url)). "
         "Do NOT use bullet points. Write in plain prose as a single cohesive paragraph. "
         "Output only the paragraph — no headings, no preamble."
     )

@@ -127,7 +127,13 @@ def collect_merged_prs():
             },
         )
         return [
-            {"title": pr["title"], "body": (pr.get("body") or "")[:300]}
+            {
+                "title":  pr["title"],
+                "number": pr["number"],
+                "repo":   pr.get("repository_url", "").split("/")[-1],
+                "url":    pr["html_url"],
+                "body":   (pr.get("body") or "")[:300],
+            }
             for pr in items
         ]
     except Exception as e:
@@ -215,7 +221,7 @@ def _template_narrative(prs, commits, branch_work):
         return f"No activity was recorded for {MONTH_LABEL}."
     parts = []
     if prs:
-        titles = "; ".join(p["title"] for p in prs[:4])
+        titles = "; ".join(p['title'] for p in prs[:4])
         parts.append(f"Work this month focused on {titles}.")
     if commits:
         msgs = "; ".join(commits[:4])

@@ -275,7 +275,7 @@ def _template_narrative(prs, commits, branch_work):
         return f"_No activity recorded for {SUMMARY_DATE.strftime('%B %d, %Y')}._"
     parts = []
     if narrative_prs:
-        titles = "; ".join(p["title"][:70] for p in narrative_prs[:3])
+        titles = "; ".join(f"[#{p['number']}]({p['url']}) {p['title'][:60]}" for p in narrative_prs[:3])
         parts.append(f"Pull request activity centred on: {titles}.")
     if commits:
         unique = list(dict.fromkeys(commits[:6]))
@@ -293,7 +293,7 @@ def generate_narrative(prs, commits, branch_work):
         return f"_No activity recorded for {SUMMARY_DATE.strftime('%B %d, %Y')}._"
 
     pr_block = "\n".join(
-        f"- PR #{p['number']} ({p['state']}) [{p['repo']}]: {p['title']}"
+        f"- [#{p['number']}]({p['url']}) ({p['state']}) [{p['repo']}]: {p['title']}"
         + (f"\n  {p['body'][:200]}" if p["body"].strip() else "")
         for p in narrative_prs
     ) or "None"
@@ -314,6 +314,7 @@ def generate_narrative(prs, commits, branch_work):
         "Describe the theme and purpose of the work, not individual commits. "
         "Include work done directly in branches even if no PR exists yet. "
         "Mention specific variable names, components, or files only when central to the changes. "
+        "When referencing a PR, use its markdown link exactly as given in the input (e.g. [#123](url)). "
         "Do NOT use bullet points. Write in plain prose as a single paragraph. "
         "Output only the paragraph — no headings, no preamble."
     )
