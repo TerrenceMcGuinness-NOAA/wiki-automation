@@ -59,6 +59,12 @@ except ImportError:
 _TRACK_REPOS  = {r.split("/")[-1] for r in (_cfg.get("track_repos") or [])}
 _IGNORE_REPOS = {r.split("/")[-1] for r in (_cfg.get("ignore_repos") or [])}
 
+# ── Schedule-disable check ────────────────────────────────────────────────────
+if _cfg.get("enable_weekly", True) is False:
+    if os.environ.get("GITHUB_EVENT_NAME") == "schedule":
+        print("Weekly summary disabled in config.yml — skipping scheduled run.")
+        sys.exit(0)
+
 
 def _should_scan(repo_data):
     name = repo_data["name"]
@@ -428,7 +434,9 @@ def build_branch_work_table(branch_work):
 
 # ── Build output ──────────────────────────────────────────────────────────────
 narrative    = generate_narrative(all_prs, commit_messages, branch_work_commits)
-pr_table     = build_pr_table([p for p in all_prs if p.get("had_commits", True)])
+pr_table     = build_pr_table([p for p in all_prs
+                               if p.get("had_commits", True)
+                               or in_window(p.get("created_at", ""))])
 branch_table = build_branch_work_table(branch_work_commits)
 
 sections = [

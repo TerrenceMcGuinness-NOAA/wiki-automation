@@ -68,6 +68,12 @@ except ImportError:
 _TRACK_REPOS  = {r.split("/")[-1] for r in (_cfg.get("track_repos") or [])}
 _IGNORE_REPOS = {r.split("/")[-1] for r in (_cfg.get("ignore_repos") or [])}
 
+# ── Schedule-disable check ────────────────────────────────────────────────────
+if _cfg.get("enable_monthly", True) is False:
+    if os.environ.get("GITHUB_EVENT_NAME") == "schedule":
+        print("Monthly summary disabled in config.yml — skipping scheduled run.")
+        sys.exit(0)
+
 
 def _should_scan(repo_data):
     name = repo_data["name"]
