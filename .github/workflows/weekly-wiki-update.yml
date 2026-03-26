@@ -52,11 +52,8 @@ jobs:
             printf '# Weekly Updates\n\nWeekly narrative summaries of work activity.\n\n---\n\n' > Weekly-Updates.md
           fi
 
-          # Remove existing entry for this week (avoids duplicates on re-runs)
+          # Insert entry at the correct chronological position (newest first)
           python3 ../dedup_wiki.py ../weekly_summary_patch.md Weekly-Updates.md
-
-          cat ../weekly_summary_patch.md Weekly-Updates.md > tmp.md
-          mv tmp.md Weekly-Updates.md
 
           if ! grep -q 'Weekly-Updates' _Sidebar.md 2>/dev/null; then
             printf '\n* [[Weekly Updates|Weekly-Updates]]\n' >> _Sidebar.md

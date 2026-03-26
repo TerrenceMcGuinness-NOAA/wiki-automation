@@ -1,39 +1,121 @@
 #!/usr/bin/env python3
-"""Remove an existing wiki entry before prepending to avoid duplicates on re-runs.
+"""Upsert a wiki entry at the correct chronological position (newest first).
 
 Usage: python3 dedup_wiki.py <patch_file> <wiki_file>
   patch_file : newly generated *_summary_patch.md
   wiki_file  : target wiki page (e.g. Daily-Updates.md, stripped.md)
 
-The first line of patch_file is used as the section key to find and remove:
-  - "## ..." headers  -> removes from that header to the next ## or end of file
-  - "- **Month**:..." -> removes the matching monthly bullet block
+Handles two formats:
+  - Section-based : "## March 26, 2026" or "## Week of March 23, 2026"
+  - Bullet-based  : "- **March 2026**: ..."  (monthly)
+
+The existing entry for the same date is removed (if present), then the new
+entry is inserted at the correct date-sorted position (newest first).
 """
 import re, sys, os
+from datetime import datetime
+
+
+def parse_date(line):
+    line = line.strip()
+    # Monthly bullet: "- **March 2026**: ..."
+    m = re.match(r"- \*\*([^*]+)\*\*:", line)
+    if m:
+        try:
+            return datetime.strptime(m.group(1).strip(), "%B %Y")
+        except ValueError:
+            pass
+    # Weekly section: "## Week of March 23, 2026"
+    if line.startswith("## Week of "):
+        try:
+            return datetime.strptime(line[11:], "%B %d, %Y")
+        except ValueError:
+            pass
+    # Daily section: "## March 26, 2026"
+    if line.startswith("## "):
+        try:
+            return datetime.strptime(line[3:], "%B %d, %Y")
+        except ValueError:
+            pass
+    return None
+
 
 if len(sys.argv) < 3:
     sys.exit(0)
 
 patch_file, wiki_file = sys.argv[1], sys.argv[2]
 
-if not os.path.exists(wiki_file) or not os.path.exists(patch_file):
+if not os.path.exists(patch_file):
     sys.exit(0)
 
-first_line = open(patch_file, encoding="utf-8").readline().strip()
+patch_text = open(patch_file, encoding="utf-8").read()
+first_line = next((ln for ln in patch_text.splitlines() if ln.strip()), "")
 if not first_line:
+    sys.exit(0)
+
+new_date = parse_date(first_line)
+monthly = bool(re.match(r"- \*\*[^*]+\*\*:", first_line.strip()))
+
+# Wiki file doesn't exist yet — just write the patch and exit
+if not os.path.exists(wiki_file):
+    open(wiki_file, "w", encoding="utf-8").write(patch_text.rstrip() + "\n")
     sys.exit(0)
 
 txt = open(wiki_file, encoding="utf-8").read()
 
-# Monthly bullet format: "- **March 2026**: ..."
-m = re.match(r"(- \*\*[^*]+\*\*:)", first_line)
-if m:
-    key = re.escape(m.group(1))
-    txt = re.sub(key + r".*?\n\n", "", txt, count=1, flags=re.DOTALL)
+# ── DEDUP: remove any existing entry for the same key ──────────────────────
+if monthly:
+    key_m = re.match(r"(- \*\*[^*]+\*\*:)", first_line.strip())
+    if key_m:
+        txt = re.sub(re.escape(key_m.group(1)) + r".*?\n(?=\n|\Z)", "",
+                     txt, count=1, flags=re.DOTALL)
 else:
-    # Daily/weekly section header: "## March 26, 2026" or "## Week of ..."
-    key = re.escape(first_line)
-    txt = re.sub(key + r".*?(?=\n## |\Z)", "", txt, count=1, flags=re.DOTALL)
+    txt = re.sub(re.escape(first_line.strip()) + r".*?(?=\n## |\Z)", "",
+                 txt, count=1, flags=re.DOTALL)
 
-txt = re.sub(r"\n{3,}", "\n\n", txt)
+txt = re.sub(r"\n{3,}", "\n\n", txt).strip()
+
+# ── INSERT at correct chronological position (newest first) ────────────────
+new_entry = patch_text.rstrip()
+
+if monthly:
+    # Split into preamble + individual bullet blocks
+    bullet_split = re.split(r"\n(?=- \*\*)", "\n" + txt)
+    preamble = bullet_split[0].lstrip("\n").rstrip()
+    bullets = [b.lstrip("\n").rstrip() for b in bullet_split[1:] if b.strip()]
+
+    inserted = False
+    result = []
+    for b in bullets:
+        b_date = parse_date(b.splitlines()[0] if b else "")
+        if not inserted and (new_date is None or b_date is None or b_date <= new_date):
+            result.append(new_entry)
+            inserted = True
+        result.append(b)
+    if not inserted:
+        result.append(new_entry)
+
+    out_parts = ([preamble] if preamble else []) + result
+    txt = "\n\n".join(out_parts) + "\n"
+
+else:
+    # Split into preamble + ## sections
+    split = re.split(r"\n(?=## )", "\n" + txt)
+    preamble = split[0].lstrip("\n").rstrip()
+    sections = [s.lstrip("\n").rstrip() for s in split[1:] if s.strip()]
+
+    inserted = False
+    result = []
+    for s in sections:
+        s_date = parse_date(s.splitlines()[0] if s else "")
+        if not inserted and (new_date is None or s_date is None or s_date <= new_date):
+            result.append(new_entry)
+            inserted = True
+        result.append(s)
+    if not inserted:
+        result.append(new_entry)
+
+    out_parts = ([preamble] if preamble else []) + result
+    txt = "\n\n".join(out_parts) + "\n"
+
 open(wiki_file, "w", encoding="utf-8").write(txt)

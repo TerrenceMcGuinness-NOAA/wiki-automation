@@ -53,11 +53,8 @@ jobs:
               > Daily-Updates.md
           fi
 
-          # Remove existing entry for this date (avoids duplicates on re-runs)
+          # Insert entry at the correct chronological position (newest first)
           python3 ../dedup_wiki.py ../daily_summary_patch.md Daily-Updates.md
-
-          cat ../daily_summary_patch.md Daily-Updates.md > tmp_updates.md
-          mv tmp_updates.md Daily-Updates.md
 
           if ! grep -q 'Daily-Updates' _Sidebar.md; then
             printf '\n* [[Daily Updates|Daily-Updates]]\n' >> _Sidebar.md
