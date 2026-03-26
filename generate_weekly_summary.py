@@ -365,7 +365,7 @@ def generate_narrative(prs, commits, branch_work):
     commit_block = "\n".join(f"- {m}" for m in commits[:25]) or "None"
 
     branch_block = "\n".join(
-        f"- [{b}]: {'; '.join(msgs[:3])}"
+        f"- Branch {b}: {'; '.join(msgs[:3])}"
         for b, msgs in branch_work.items()
     ) or "None"
 
@@ -382,6 +382,7 @@ def generate_narrative(prs, commits, branch_work):
         "are central to the descriptions. "
         "When referencing a PR, use its markdown link exactly as given in the input (e.g. [#123](url)). "
         "Do NOT use bullet points. Write in plain prose as a single cohesive paragraph. "
+        "When referencing branch work, always use the full branch name exactly as given (e.g. repo-name/branch-name). "
         "Output only the paragraph — no headings, no preamble."
     )
 
