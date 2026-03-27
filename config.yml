@@ -23,9 +23,9 @@ enable_monthly: true
 #     - AntonMFernando-NOAA/global-workflow
 #     - AntonMFernando-NOAA/ufs-weather-model
 track_repos:
-    TerrenceMcGuinness-NOAA/global-workflow
-    TerrenceMcGuinness-NOAA/MDC-MCP-GraphRAG
-    TerrenceMcGuinness-NOAA/rocoto
+    - TerrenceMcGuinness-NOAA/global-workflow
+    - TerrenceMcGuinness-NOAA/MDC-MCP-GraphRAG
+    - TerrenceMcGuinness-NOAA/rocoto
 
 # Repositories to ignore entirely (by bare name or "owner/name").
 # Useful to exclude forks, mirrors, or noise repos.
