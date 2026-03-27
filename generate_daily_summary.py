@@ -406,7 +406,9 @@ try:
         owner      = repo_full.split("/")[0]
 
         # Default branch commits
-        commit_messages.extend(_branch_msgs(repo_full, default_br))
+        commit_messages.extend(
+            f"[{repo_data['name']}]: {m}" for m in _branch_msgs(repo_full, default_br)
+        )
 
         # All other branches
         try:
@@ -429,7 +431,7 @@ try:
                 pr_list = []
             if pr_list:
                 active_pr_branches.add((repo_full, branch))
-                commit_messages.extend(msgs)
+                commit_messages.extend(f"[{repo_data['name']}]: {m}" for m in msgs)
             else:
                 key = f"{repo_data['name']}/{branch}"
                 branch_work_commits.setdefault(key, []).extend(msgs)
@@ -458,7 +460,9 @@ for p in all_prs:
             p["had_commits"] = bool(msgs)
             if msgs:
                 active_pr_branches.add((head_repo_full, branch))
-                commit_messages.extend(msgs)
+                commit_messages.extend(
+                    f"[{head_repo_full.split('/')[-1]}]: {m}" for m in msgs
+                )
         else:
             p["had_commits"] = False
     except Exception:
@@ -540,6 +544,8 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
         "When referencing a PR or issue, use its markdown link exactly as given in the input (e.g. [#123](url)). "
         "Do NOT use bullet points. Write in plain prose as a single paragraph. "
         "When referencing branch work, always use the full branch name exactly as given (e.g. repo-name/branch-name). "
+        "Naturally integrate the repository name into the narrative where relevant "
+        "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
         "Output only the paragraph — no headings, no preamble."
     )
 
