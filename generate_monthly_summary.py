@@ -417,7 +417,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
         prompt = (
             f"Below is the GitHub activity for {MONTH_LABEL}.\n\n"
             f"{activity_text}\n\n"
-            f"Write exactly {_SUMMARY_BULLET_COUNT} concise first-person bullet points summarising the month's work (use 'I', not 'the developer'). "
+            f"Write exactly {_SUMMARY_BULLET_COUNT} concise bullet points summarising the month's work (Do not use pronouns and write in third person infinitive). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Each bullet should cover one high-level theme or area of work. "
             "When referencing branch work, use the repo name the branch belonged to. "
@@ -429,7 +429,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
         prompt = (
             f"Below is the GitHub activity for {MONTH_LABEL}.\n\n"
             f"{activity_text}\n\n"
-            f"Write a concise first-person narrative summary of the month's work in no more than {_SUMMARY_WORD_LIMIT} words (use 'I', not 'the developer'). "
+            f"Write a concise summary of the month's work in no more than {_SUMMARY_WORD_LIMIT} words (Do not use pronouns and write in third person infinitive). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Focus on the overall themes and goals, not individual items. "
             "Do NOT use bullet points. "
@@ -448,7 +448,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
                 "Content-Type": "application/json",
             },
             json={
-                "model": "gpt-4o",
+                "model": "Meta-Llama-3.1-405B-Instruct",
                 "messages": [
                     {
                         "role": "system",
