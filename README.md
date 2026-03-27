@@ -2,7 +2,7 @@
 
 Automatically post **daily, weekly, and monthly summaries** of your GitHub
 activity (commits, pull requests, and issues) to your repository's wiki.
-Summaries are generated as first-person narrative paragraphs using the GitHub
+Summaries are generated as first-person **narrative paragraphs or bullet-point lists** using the GitHub
 Models API (gpt-4o-mini) with a plain-text fallback — no external services or
 API keys required beyond a standard GitHub PAT.
 
@@ -120,6 +120,9 @@ repo.
 | `SUMMARY_DATE` | Manual workflow input (optional) | Override the target date; defaults to yesterday |
 | `WEEK_START` | Manual workflow input (optional) | Override the week start date (weekly workflow) |
 | `REPORT_MONTH` | Manual workflow input (optional) | Override the report month `YYYY-MM` (monthly workflow) |
+| `SUMMARY_STYLE` | Manual workflow input (optional) | Override summary style (`narrative` or `bullets`) for this run |
+| `SUMMARY_WORD_LIMIT` | Manual workflow input (optional) | Override max words for narrative for this run |
+| `SUMMARY_BULLET_COUNT` | Manual workflow input (optional) | Override number of bullet points for this run |
 
 No hardcoded repository list is needed. PRs and issues are found via GitHub's
 search API across all repositories. Commits are scanned per-branch across your
@@ -180,18 +183,49 @@ summary_bullet_count: 5
 
 ## Manual and backfill runs
 
-All three workflows support manual triggers. Go to:
+All three workflows can be triggered manually from the GitHub UI.
 
-**Actions → [workflow name] → Run workflow**
+### Steps
 
-| Field | Example | Effect |
+1. Go to your repository on GitHub.
+2. Click the **Actions** tab.
+3. Select the workflow you want to run from the left sidebar:
+   - **Daily Wiki Update**
+   - **Weekly Wiki Update**
+   - **Monthly Wiki Update**
+4. Click **Run workflow** (top-right of the workflow run list).
+5. Fill in the input fields (all are optional — leave blank for defaults).
+6. Click the green **Run workflow** button.
+
+### Daily workflow inputs
+
+| Input | Example | Effect |
 |-------|---------|--------|
-| Date (daily) | `2026-03-20` | Summarise that specific day |
-| Week start (weekly) | `2026-03-16` | Summarise the week starting on that Monday |
-| Month (monthly) | `2026-02` | Summarise that calendar month |
+| Date | `2026-03-20` | Summarise that specific day. Leave blank for yesterday. |
+| Summary style | `bullets` | `narrative` or `bullets`. Leave blank to use `config.yml`. |
+| Max words (narrative) | `100` | Word limit for narrative style. Leave blank for `config.yml` value. |
+| Bullet count | `4` | Number of bullet points. Leave blank for `config.yml` value. |
 
-Leave fields blank to use the default (yesterday / last week / last month).
-Manual triggers are not restricted to the scheduled days.
+### Weekly workflow inputs
+
+| Input | Example | Effect |
+|-------|---------|--------|
+| Week start | `2026-03-16` | Any date within the target week. Leave blank for the current week. |
+| Summary style | `narrative` | `narrative` or `bullets`. Leave blank to use `config.yml`. |
+| Max words (narrative) | `130` | Word limit for narrative style. Leave blank for `config.yml` value. |
+| Bullet count | `5` | Number of bullet points. Leave blank for `config.yml` value. |
+
+### Monthly workflow inputs
+
+| Input | Example | Effect |
+|-------|---------|--------|
+| Month | `2026-02` | Month to summarise in `YYYY-MM` format. Leave blank for last month. |
+| Summary style | `bullets` | `narrative` or `bullets`. Leave blank to use `config.yml`. |
+| Max words (narrative) | `130` | Word limit for narrative style. Leave blank for `config.yml` value. |
+| Bullet count | `6` | Number of bullet points. Leave blank for `config.yml` value. |
+
+> **Note:** Workflow dispatch inputs override `config.yml` for that single run only.
+> The permanent default is always whatever is set in `config.yml`.
 
 ---
 

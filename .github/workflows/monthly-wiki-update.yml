@@ -9,6 +9,23 @@ on:
         description: 'Month to summarise (YYYY-MM). Leave blank for last month.'
         required: false
         default: ''
+      summary_style:
+        description: 'Summary style. Leave blank to use config.yml setting.'
+        required: false
+        type: choice
+        default: ''
+        options:
+          - ''
+          - narrative
+          - bullets
+      summary_word_limit:
+        description: 'Max words for narrative (e.g. 130). Leave blank for config.yml value.'
+        required: false
+        default: ''
+      summary_bullet_count:
+        description: 'Number of bullet points (e.g. 5). Leave blank for config.yml value.'
+        required: false
+        default: ''
 
 jobs:
   update-wiki:
@@ -52,6 +69,9 @@ jobs:
           GH_TOKEN: ${{ secrets.WIKI_PAT }}
           GITHUB_ACTOR: ${{ vars.GITHUB_ACTOR || github.repository_owner }}
           REPORT_MONTH: ${{ inputs.month }}
+          SUMMARY_STYLE: ${{ inputs.summary_style }}
+          SUMMARY_WORD_LIMIT: ${{ inputs.summary_word_limit }}
+          SUMMARY_BULLET_COUNT: ${{ inputs.summary_bullet_count }}
         run: python generate_monthly_summary.py
 
       - name: Push to wiki

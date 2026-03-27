@@ -70,6 +70,24 @@ _IGNORE_REPOS        = {r.split("/")[-1] for r in (_cfg.get("ignore_repos") or [
 _SUMMARY_STYLE        = str(_cfg.get("summary_style",        "narrative")).lower()
 _SUMMARY_WORD_LIMIT   = int(_cfg.get("summary_word_limit",   130))
 _SUMMARY_BULLET_COUNT = int(_cfg.get("summary_bullet_count", 5))
+# ── Summary style overrides from workflow_dispatch inputs ────────────────────
+# Env vars set by the workflow take precedence over config.yml values.
+_env_style = os.environ.get("SUMMARY_STYLE", "").strip().lower()
+if _env_style:
+    _SUMMARY_STYLE = _env_style
+_env_wl = os.environ.get("SUMMARY_WORD_LIMIT", "").strip()
+if _env_wl:
+    try:
+        _SUMMARY_WORD_LIMIT = int(_env_wl)
+    except ValueError:
+        pass
+_env_bc = os.environ.get("SUMMARY_BULLET_COUNT", "").strip()
+if _env_bc:
+    try:
+        _SUMMARY_BULLET_COUNT = int(_env_bc)
+    except ValueError:
+        pass
+
 
 # ── Schedule-disable check ────────────────────────────────────────────────────
 if _cfg.get("enable_monthly", True) is False:
