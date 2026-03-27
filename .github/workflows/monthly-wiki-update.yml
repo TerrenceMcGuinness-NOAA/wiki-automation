@@ -44,7 +44,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.check_last_day.outputs.skip != 'true'
-        run: pip install requests
+        run: pip install requests pyyaml
 
       - name: Generate monthly summary
         if: steps.check_last_day.outputs.skip != 'true'
