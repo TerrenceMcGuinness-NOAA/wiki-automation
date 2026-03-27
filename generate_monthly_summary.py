@@ -66,7 +66,10 @@ except ImportError:
     _cfg = {}
 
 _TRACK_REPOS  = {r.split("/")[-1] for r in (_cfg.get("track_repos") or [])}
-_IGNORE_REPOS = {r.split("/")[-1] for r in (_cfg.get("ignore_repos") or [])}
+_IGNORE_REPOS        = {r.split("/")[-1] for r in (_cfg.get("ignore_repos") or [])}
+_SUMMARY_STYLE        = str(_cfg.get("summary_style",        "narrative")).lower()
+_SUMMARY_WORD_LIMIT   = int(_cfg.get("summary_word_limit",   130))
+_SUMMARY_BULLET_COUNT = int(_cfg.get("summary_bullet_count", 5))
 
 # ── Schedule-disable check ────────────────────────────────────────────────────
 if _cfg.get("enable_monthly", True) is False:
@@ -392,20 +395,34 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
         activity_sections.append(f"PRs reviewed this month:\n{review_block}")
     activity_text = "\n\n".join(activity_sections) or "No activity recorded."
 
-    prompt = (
-        f"Below is the GitHub activity for {MONTH_LABEL}.\n\n"
-        f"{activity_text}\n\n"
-        "Write a concise first-person narrative summary of the month's work in no more than 130 words (use 'I', not 'the developer'). "
-        "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
-        "Focus on the overall themes and goals, not individual items. "
-        "Do NOT mention PR numbers, issue numbers, commit hashes, URLs, or weeks. "
-        "Do NOT use bullet points. "
-        "Write in plain prose as a single cohesive paragraph. "
-        "When referencing branch work, use the repo name the branch belonged to and consider these are ongoing work. "
-        "Naturally integrate the repository name into the narrative where relevant "
-        "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
-        "Output only the paragraph — no headings, no preamble."
-    )
+    if _SUMMARY_STYLE == "bullets":
+        prompt = (
+            f"Below is the GitHub activity for {MONTH_LABEL}.\n\n"
+            f"{activity_text}\n\n"
+            f"Write exactly {_SUMMARY_BULLET_COUNT} concise first-person bullet points summarising the month's work (use 'I', not 'the developer'). "
+            "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
+            "Each bullet should cover one high-level theme or area of work. "
+            "Do NOT mention PR numbers, issue numbers, commit hashes, or URLs. "
+            "When referencing branch work, use the repo name the branch belonged to. "
+            "Naturally integrate the repository name into each bullet where relevant "
+            "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
+            "Output only the bullet list — no headings, no preamble."
+        )
+    else:
+        prompt = (
+            f"Below is the GitHub activity for {MONTH_LABEL}.\n\n"
+            f"{activity_text}\n\n"
+            f"Write a concise first-person narrative summary of the month's work in no more than {_SUMMARY_WORD_LIMIT} words (use 'I', not 'the developer'). "
+            "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
+            "Focus on the overall themes and goals, not individual items. "
+            "Do NOT mention PR numbers, issue numbers, commit hashes, URLs, or weeks. "
+            "Do NOT use bullet points. "
+            "Write in plain prose as a single cohesive paragraph. "
+            "When referencing branch work, use the repo name the branch belonged to and consider these are ongoing work. "
+            "Naturally integrate the repository name into the narrative where relevant "
+            "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
+            "Output only the paragraph — no headings, no preamble."
+        )
 
     try:
         resp = requests.post(
@@ -428,7 +445,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
                     },
                     {"role": "user", "content": prompt},
                 ],
-                "max_tokens": 200,
+                "max_tokens": 300,
                 "temperature": 0.3,
             },
             timeout=30,
@@ -445,7 +462,13 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
 # ── Write output ──────────────────────────────────────────────────────────────
 def write_summary(narrative):
     with open("monthly_summary_patch.md", "w") as f:
-        f.write(f"- **{MONTH_LABEL}**: {narrative}\n\n")
+        if _SUMMARY_STYLE == "bullets":
+            # Indent each bullet so it nests under the month key
+            indented = "\n".join("  " + ln if ln.strip() else ln
+                                  for ln in narrative.splitlines())
+            f.write(f"- **{MONTH_LABEL}**:\n{indented}\n\n")
+        else:
+            f.write(f"- **{MONTH_LABEL}**: {narrative}\n\n")
     print("✓ Monthly summary written to monthly_summary_patch.md")
 
 # ── Main ──────────────────────────────────────────────────────────────────────

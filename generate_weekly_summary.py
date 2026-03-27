@@ -57,7 +57,10 @@ except ImportError:
     _cfg = {}
 
 _TRACK_REPOS  = {r.split("/")[-1] for r in (_cfg.get("track_repos") or [])}
-_IGNORE_REPOS = {r.split("/")[-1] for r in (_cfg.get("ignore_repos") or [])}
+_IGNORE_REPOS        = {r.split("/")[-1] for r in (_cfg.get("ignore_repos") or [])}
+_SUMMARY_STYLE        = str(_cfg.get("summary_style",        "narrative")).lower()
+_SUMMARY_WORD_LIMIT   = int(_cfg.get("summary_word_limit",   130))
+_SUMMARY_BULLET_COUNT = int(_cfg.get("summary_bullet_count", 5))
 
 # ── Schedule-disable check ────────────────────────────────────────────────────
 if _cfg.get("enable_weekly", True) is False:
@@ -536,20 +539,35 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
         activity_sections.append(f"PRs reviewed this week:\n{review_block}")
     activity_text = "\n\n".join(activity_sections) or "No activity recorded."
 
-    prompt = (
-        f"Below is the GitHub activity for the week of "
-        f"{MONDAY.strftime('%B %d')}–{FRIDAY.strftime('%B %d, %Y')}.\n\n"
-        f"{activity_text}\n\n"
-        "Write a concise first-person narrative work summary in no more than 130 words (use 'I', not 'the developer'). "
-        "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
-        "Focus on the themes and goals of the work, not individual commits. "
-        "When referencing a PR or issue, use its markdown link exactly as given in the input (e.g. [#123](url)). "
-        "Do NOT use bullet points. Write in plain prose as a single cohesive paragraph. "
-        "When referencing branch work, use the repository name branch belonged to and describe the tasks as in-progress. "
-        "Naturally integrate the repository name into the narrative where relevant "
-        "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
-        "Output only the paragraph — no headings, no preamble."
-    )
+    if _SUMMARY_STYLE == "bullets":
+        prompt = (
+            f"Below is the GitHub activity for the week of "
+            f"{MONDAY.strftime('%B %d')}–{FRIDAY.strftime('%B %d, %Y')}.\n\n"
+            f"{activity_text}\n\n"
+            f"Write exactly {_SUMMARY_BULLET_COUNT} concise first-person bullet points summarising the key tasks this week (use 'I', not 'the developer'). "
+            "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
+            "Each bullet should cover one distinct task or theme. "
+            "When referencing a PR or issue, use its markdown link exactly as given in the input (e.g. [#123](url)). "
+            "When referencing branch work, use the repository name the branch belonged to and describe the tasks as in-progress. "
+            "Naturally integrate the repository name into each bullet where relevant "
+            "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
+            "Output only the bullet list — no headings, no preamble."
+        )
+    else:
+        prompt = (
+            f"Below is the GitHub activity for the week of "
+            f"{MONDAY.strftime('%B %d')}–{FRIDAY.strftime('%B %d, %Y')}.\n\n"
+            f"{activity_text}\n\n"
+            f"Write a concise first-person narrative work summary in no more than {_SUMMARY_WORD_LIMIT} words (use 'I', not 'the developer'). "
+            "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
+            "Focus on the themes and goals of the work, not individual commits. "
+            "When referencing a PR or issue, use its markdown link exactly as given in the input (e.g. [#123](url)). "
+            "Do NOT use bullet points. Write in plain prose as a single cohesive paragraph. "
+            "When referencing branch work, use the repository name branch belonged to and describe the tasks as in-progress. "
+            "Naturally integrate the repository name into the narrative where relevant "
+            "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
+            "Output only the paragraph — no headings, no preamble."
+        )
 
     try:
         resp = requests.post(
@@ -571,7 +589,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
                     },
                     {"role": "user", "content": prompt},
                 ],
-                "max_tokens": 200,
+                "max_tokens": 300,
                 "temperature": 0.3,
             },
             timeout=30,

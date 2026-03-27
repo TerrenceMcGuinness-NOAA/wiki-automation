@@ -33,3 +33,13 @@ track_repos: []
 #     - some-fork
 ignore_repos:
   - AntonMFernando-NOAA/wiki-automation
+
+# ── Summary style ─────────────────────────────────────────────────────────────
+# Controls how the AI-generated work summary is written.
+#   narrative (default) : a concise prose paragraph
+#   bullets             : a bullet-point list
+# summary_word_limit   : max words when style is "narrative" (default: 130)
+# summary_bullet_count : number of bullet points when style is "bullets" (default: 5)
+summary_style: narrative
+summary_word_limit: 130
+summary_bullet_count: 5

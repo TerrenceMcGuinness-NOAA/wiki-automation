@@ -151,6 +151,13 @@ ignore_repos:
 enable_daily:   true
 enable_weekly:  true
 enable_monthly: true
+
+# Summary style: "narrative" (default) or "bullets".
+# summary_word_limit   applies when style is "narrative" (default: 130).
+# summary_bullet_count applies when style is "bullets"  (default: 5).
+summary_style: narrative
+summary_word_limit: 130
+summary_bullet_count: 5
 ```
 
 | Key | Default | Behaviour |
@@ -160,6 +167,9 @@ enable_monthly: true
 | `enable_daily` | `true` | Set to `false` to prevent the daily cron from running. |
 | `enable_weekly` | `true` | Set to `false` to prevent the weekly cron from running. |
 | `enable_monthly` | `true` | Set to `false` to prevent the monthly cron from running. |
+| `summary_style` | `narrative` | `narrative` = prose paragraph; `bullets` = bullet-point list. |
+| `summary_word_limit` | `130` | Maximum words in the narrative paragraph. |
+| `summary_bullet_count` | `5` | Number of bullet points when style is `bullets`. |
 
 > **Note:** `pyyaml` must be available in the runner environment for
 > `config.yml` to be loaded. If it is missing, the scripts fall back to
