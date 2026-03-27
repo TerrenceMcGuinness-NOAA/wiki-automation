@@ -420,7 +420,6 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
             f"Write exactly {_SUMMARY_BULLET_COUNT} concise first-person bullet points summarising the month's work (use 'I', not 'the developer'). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Each bullet should cover one high-level theme or area of work. "
-            "Do NOT mention PR numbers, issue numbers, commit hashes, or URLs. "
             "When referencing branch work, use the repo name the branch belonged to. "
             "Naturally integrate the repository name into each bullet where relevant "
             "(e.g. 'in global-workflow', 'in GDASApp') so it is clear where each activity occurred. "
@@ -433,7 +432,6 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
             f"Write a concise first-person narrative summary of the month's work in no more than {_SUMMARY_WORD_LIMIT} words (use 'I', not 'the developer'). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Focus on the overall themes and goals, not individual items. "
-            "Do NOT mention PR numbers, issue numbers, commit hashes, URLs, or weeks. "
             "Do NOT use bullet points. "
             "Write in plain prose as a single cohesive paragraph. "
             "When referencing branch work, use the repo name the branch belonged to and consider these are ongoing work. "
@@ -450,7 +448,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
                 "Content-Type": "application/json",
             },
             json={
-                "model": "gpt-4o-mini",
+                "model": "gpt-4o",
                 "messages": [
                     {
                         "role": "system",
