@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
     inputs:
       date:
-        description: 'Date to summarise (YYYY-MM-DD). Leave blank for yesterday.'
+        description: 'Date to summarise (YYYY-MM-DD)'
         required: false
         default: ''
       summary_style:
-        description: 'Summary style. Leave blank to use config.yml setting.'
+        description: 'Summary style'
         required: false
         type: choice
         default: ''
@@ -19,11 +19,11 @@ on:
           - narrative
           - bullets
       summary_word_limit:
-        description: 'Max words for narrative (e.g. 130). Leave blank for config.yml value.'
+        description: 'Max words for narrative (e.g. 130)'
         required: false
         default: ''
       summary_bullet_count:
-        description: 'Number of bullet points (e.g. 5). Leave blank for config.yml value.'
+        description: 'Number of bullet points (e.g. 5)'
         required: false
         default: ''
 
