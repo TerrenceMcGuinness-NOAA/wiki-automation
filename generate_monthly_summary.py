@@ -417,7 +417,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
         prompt = (
             f"Below is the GitHub activity for {MONTH_LABEL}.\n\n"
             f"{activity_text}\n\n"
-            f"Write exactly {_SUMMARY_BULLET_COUNT} concise first-person bullet points summarising the month's work (use 'I', not 'the developer'). "
+            f"Write exactly {_SUMMARY_BULLET_COUNT} concise bullet points summarising the month's work — omit the subject pronoun and start each bullet directly with a past-tense verb (e.g. 'Worked on...', not 'I worked on...'). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Each bullet should cover one high-level theme or area of work. "
             "Do NOT mention PR numbers, issue numbers, commit hashes, or URLs. "
@@ -430,7 +430,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
         prompt = (
             f"Below is the GitHub activity for {MONTH_LABEL}.\n\n"
             f"{activity_text}\n\n"
-            f"Write a concise first-person narrative summary of the month's work in no more than {_SUMMARY_WORD_LIMIT} words (use 'I', not 'the developer'). "
+            f"Write a concise narrative summary of the month's work in no more than {_SUMMARY_WORD_LIMIT} words — omit the subject pronoun and start sentences directly with a past-tense verb (e.g. 'Worked on...', not 'I worked on...'). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Focus on the overall themes and goals, not individual items. "
             "Do NOT mention PR numbers, issue numbers, commit hashes, URLs, or weeks. "
@@ -455,8 +455,8 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
                     {
                         "role": "system",
                         "content": (
-                            "You are writing a first-person monthly work log entry for a software developer. "
-                            "Write as 'I' — never say 'the developer' or 'they'. "
+                            "You are writing a monthly work log entry for a software developer. "
+                            "Do NOT use 'I', 'the developer', or 'they' — omit the subject pronoun entirely and begin sentences with a past-tense verb (e.g. 'Worked on...', 'Fixed...', 'Added...'). "
                             "Be specific about what was worked on; avoid generic filler. "
                             "Never mention PR numbers, issue numbers, commit hashes, URLs, or specific week dates."
                         ),

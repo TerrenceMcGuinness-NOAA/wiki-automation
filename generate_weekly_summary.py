@@ -562,7 +562,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
             f"Below is the GitHub activity for the week of "
             f"{MONDAY.strftime('%B %d')}–{FRIDAY.strftime('%B %d, %Y')}.\n\n"
             f"{activity_text}\n\n"
-            f"Write exactly {_SUMMARY_BULLET_COUNT} concise first-person bullet points summarising the key tasks this week (use 'I', not 'the developer'). "
+            f"Write exactly {_SUMMARY_BULLET_COUNT} concise bullet points summarising the key tasks this week — omit the subject pronoun and start each bullet directly with a past-tense verb (e.g. 'Worked on...', not 'I worked on...'). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Each bullet should cover one distinct task or theme. "
             "When referencing a PR or issue, use its markdown link exactly as given in the input (e.g. [#123](url)). "
@@ -576,7 +576,7 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
             f"Below is the GitHub activity for the week of "
             f"{MONDAY.strftime('%B %d')}–{FRIDAY.strftime('%B %d, %Y')}.\n\n"
             f"{activity_text}\n\n"
-            f"Write a concise first-person narrative work summary in no more than {_SUMMARY_WORD_LIMIT} words (use 'I', not 'the developer'). "
+            f"Write a concise narrative work summary in no more than {_SUMMARY_WORD_LIMIT} words — omit the subject pronoun and start sentences directly with a past-tense verb (e.g. 'Worked on...', not 'I worked on...'). "
             "Only describe the categories listed above — do NOT mention or imply the absence of any category not listed. "
             "Focus on the themes and goals of the work, not individual commits. "
             "When referencing a PR or issue, use its markdown link exactly as given in the input (e.g. [#123](url)). "
@@ -600,8 +600,8 @@ def generate_narrative(prs, commits, branch_work, created_issues=None, pr_review
                     {
                         "role": "system",
                         "content": (
-                            "You are writing a first-person weekly work log entry for a software developer. "
-                            "Write as 'I' — never say 'the developer' or 'they'. "
+                            "You are writing a weekly work log entry for a software developer. "
+                            "Do NOT use 'I', 'the developer', or 'they' — omit the subject pronoun entirely and begin sentences with a past-tense verb (e.g. 'Worked on...', 'Fixed...', 'Added...'). "
                             "Be specific about what was worked on; avoid generic filler sentences."
                         ),
                     },
