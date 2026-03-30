@@ -1,4 +1,5 @@
 # GitHub Activity Wiki Automation — Setup Guide
+# My Branch
 
 Automatically post **daily, weekly, and monthly summaries** of your GitHub
 activity (commits, pull requests, and issues) to your repository's wiki.
